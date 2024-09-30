@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Police Name Search System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1, h2 {
+            font-family: 'Poppins', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: glow 2s infinite alternate;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            padding: 30px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background-color: rgba(52, 152, 219, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .search-container {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        input, button {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        input {
+            flex-grow: 1;
+            margin-right: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #3498db;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #searchResults, #addNameForm {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .result-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            transform: translateX(-50px);
+            opacity: 0;
+            animation: slideIn 0.5s forwards;
+            transition: all 0.3s;
+        }
+
+        .result-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        #addNameForm input {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        #transliteration {
+            margin-top: 1rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #3498db, 0 0 20px #3498db;
+            }
+            to {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #3498db, 0 0 40px #3498db;
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        h1, h2 {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(45deg, #00BFFF, #00FA9A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: glow 2s infinite alternate;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            border-bottom: 2px solid #00BFFF;
+            padding-bottom: 10px;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #00BFFF, 0 0 10px #00BFFF, 0 0 15px #00FA9A, 0 0 20px #00FA9A;
+            }
+            to {
+                text-shadow: 0 0 10px #00BFFF, 0 0 20px #00BFFF, 0 0 30px #00FA9A, 0 0 40px #00FA9A;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="container">
+        <header>
+            <h1>Advanced Police Name Search System</h1>
+        </header>
+
+        <section id="search" class="section">
+            <h2>Name Search</h2>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search for a name (Hindi or English)...">
+                <button onclick="search()">Search</button>
+            </div>
+            <div id="transliteration"></div>
+            <div id="searchResults"></div>
+        </section>
+
+        <section id="addName" class="section">
+            <h2>Add New Name</h2>
+            <button onclick="toggleAddNameForm()">Add New Name</button>
+            <div id="addNameForm">
+                <input type="text" id="hindiName" placeholder="Hindi Name">
+                <input type="text" id="englishName" placeholder="English Name">
+                <input type="text" id="relatedNames" placeholder="Related Names (comma-separated)">
+                <button onclick="addName()">Add to Database</button>
+            </div>
+        </section>
+
+        <section id="issues" class="section">
+            <h2>Issues Faced</h2>
+            <ul>
+                <li><span class="highlight">Inconsistent Transliteration:</span> Multiple valid English transliterations for Hindi names.</li>
+                <li><span class="highlight">Spelling Variations:</span> Minor differences leading to discrepancies in the database.</li>
+                <li><span class="highlight">Phonetic Similarity:</span> Similar-sounding names with different spellings.</li>
+                <li><span class="highlight">Data Entry Errors:</span> Human errors introducing further variations.</li>
+                <li><span class="highlight">Multiple Scripts:</span> Use of both Devanagari and Roman scripts.</li>
+                <li><span class="highlight">Search Efficiency:</span> Traditional algorithms struggling with variations.</li>
+            </ul>
+        </section>
+
+        <section id="impact" class="section">
+            <h2>Impact on Operations</h2>
+            <ul>
+                <li>Delayed Investigations</li>
+                <li>Resource Wastage</li>
+                <li>Legal Implications</li>
+                <li>Erosion of Public Trust</li>
+            </ul>
+        </section>
+
+        <section id="solutions" class="section">
+            <h2>Solution Requirements</h2>
+            <ul>
+                <li>Fuzzy Matching Algorithms</li>
+                <li>Standardized Transliteration</li>
+                <li>Phonetic Search Capability</li>
+                <li>Error Correction Mechanisms</li>
+                <li>Script Interoperability</li>
+                <li>Training and Guidelines</li>
+            </ul>
+        </section>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/transliteration@2.1.8/dist/browser/bundle.umd.min.js"></script>
+    <script>
+        // Mock database
+        let database = [
+            { hindiName: 'सुरेश', englishName: 'Suresh', relatedNames: ['Suresh', 'Sursh'] },
+            { hindiName: 'कुमार', englishName: 'Kumar', relatedNames: ['Kumar', 'Kumaar'] },
+            { hindiName: 'राजेश', englishName: 'Rajesh', relatedNames: ['Rajesh', 'Raajesh', 'Rajash'] }
+        ];
+
+        const fuse = new Fuse(database, {
+            keys: ['hindiName', 'englishName', 'relatedNames'],
+            includeScore: true,
+            threshold: 0.4
+        });
+
+        // Function to check if text is in Hindi
+        function isHindi(text) {
+            return /[\u0900-\u097F]/.test(text);
+        }
+
+        // Main search function
+        function search() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const isHindiInput = isHindi(searchTerm);
+
+            let transliteratedTerm;
+            if (isHindiInput) {
+                transliteratedTerm = transliterate(searchTerm);  // Transliterate Hindi to English
+            } else {
+                transliteratedTerm = transliterate.toHindi(searchTerm);  // Transliterate English to Hindi
+            }
+
+            document.getElementById('transliteration').textContent = `Searching for: ${searchTerm} (${isHindiInput ? transliteratedTerm : transliterate.toHindi(searchTerm)})`;
+
+            const results = fuse.search(searchTerm);
+            displayResults(results.map(result => result.item));
+        }
+
+        // Display search results
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '';
+            resultsDiv.style.display = results.length ? 'block' : 'none';
+
+            results.forEach((result, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    <p><strong>Hindi Name:</strong> ${result.hindiName}</p>
+                    <p><strong>English Name:</strong> ${result.englishName}</p>
+                    <p><strong>Related Names:</strong> ${result.relatedNames.join(', ')}</p>
+                `;
+                resultItem.style.animationDelay = `${index * 0.1}s`;
+                resultsDiv.appendChild(resultItem);
+            });
+        }
+
+        // Toggle add name form
+        function toggleAddNameForm() {
+            const form = document.getElementById('addNameForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Add new name to database
+        function addName() {
+            const hindiName = document.getElementById('hindiName').value;
+            const englishName = document.getElementById('englishName').value;
+            const relatedNames = document.getElementById('relatedNames').value.split(',').map(name => name.trim());
+            
+            if (hindiName && englishName) {
+                database.push({ hindiName, englishName, relatedNames });
+                fuse.add({ hindiName, englishName, relatedNames });
+                alert('New name added successfully!');
+                document.getElementById('hindiName').value = '';
+                document.getElementById('englishName').value = '';
+                document.getElementById('relatedNames').value = '';
+            } else {
+                alert('Please enter both Hindi and English names.');
+            }
+        }
+
+        // Particle effect initialization
+        particlesJS("particles", {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#ffffff"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    },
+                    "image": {
+                        "src": "img/github.svg",
+                        "width": 100,
+                        "height": 100
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 6,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Initialize sections animation
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((section, index) => {
+                section.style.animationDelay = `${index * 0.2}s`;
+                section.classList.add('fade-in');
+            });
+
+            const highlights = document.querySelectorAll('.highlight');
+            highlights.forEach(highlight => {
+                highlight.addEventListener('mouseover', () => {
+                    highlight.style.backgroundColor = 'rgba(52, 152, 219, 0.4)';
+                });
+                highlight.addEventListener('mouseout', () => {
+                    highlight.style.backgroundColor = 'rgba(52, 152, 219, 0.2)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
